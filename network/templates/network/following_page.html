@@ -1,0 +1,63 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div style="display: grid; grid-template-columns: 2fr 3fr;">
+
+  <form method="POST" action="{% url 'new_post' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <h3>New Post</h3>
+      <textarea class="form-control" cols="10" rows="3" name="new_post_textarea"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Post</button>
+  </form>
+
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h3>All Posts from who you are following</h3>
+    <ul class="px-5 w-100" style="height: 70vh;overflow-y: scroll; list-style: none;">
+      {% for post in posts_of_the_page %}
+        <li class="media-body border border-dark m-2 p-2">
+          <div class="well well-lg">
+              <a href="{% url 'user_profile' user_id=post.user.id %}" class="media-heading reviews"> {{post.user}} </a>
+              <br>
+              <small>{{post.timestamp}}</small>
+              <p class="media-comment">
+                {{post.text}}
+              </p>
+
+              <small id="number_likes_{{post.id}}">{{post.post_likes.count}}</small>
+              
+              {% if post.id in postsCurrentUserLiked %}
+                <button id="liked_post_btn_{{post.id}}" onclick="like_logic('{{post.id}}')" style="background: none; border: none;" class="fa-solid fa-thumbs-up"></button>
+              {% else %}
+                <button id="liked_post_btn_{{post.id}}" onclick="like_logic('{{post.id}}')" style="background: none; border: none;" class="fa-regular fa-thumbs-up"></button>
+              {% endif %}
+              
+          </div>              
+        </li>
+      {% endfor %}
+    </ul>
+    <nav>
+      <ul class="pagination">
+        
+          {% if posts_of_the_page.has_previous %}
+              <li class="page-item mx-2"><a class="page-link" href="?page={{posts_of_the_page.previous_page_number}}">Previous</a></li>
+          {% else %}
+              <li class="page-item mx-2"><a class="page-link text-muted">Previous</a></li>
+          {% endif %}
+
+          {% if posts_of_the_page.has_next %}
+              <li class="page-item mx-2"><a class="page-link" href="?page={{posts_of_the_page.next_page_number}}">Next</a></li>
+          {% else %}
+              <li class="page-item mx-2"><a class="page-link text-muted">Next</a></li>
+          {% endif %}
+
+      </ul>
+    </nav>
+  </div>
+
+
+
+</div>
+
+{% endblock %}

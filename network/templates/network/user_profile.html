@@ -1,0 +1,75 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+    <h3>
+        <mark>{{profile_user}}' Profile</mark>
+    </h3>
+
+    <div id="followContainer">
+        {% if current_user != profile_user  %}
+            {% if current_user_follows_post_owner %}
+                <button class="btn btn-outline-danger" onclick="unfollow_logic('{{profile_user.id}}')">Unfollow</button>
+            {% else %}
+                <button class="btn btn-outline-primary" onclick="follow_logic('{{profile_user.id}}')">Follow</button>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="d-flex" style="gap: 3rem;">
+        <p id="follwing_count">Following: {{profile_user.user_following.count}}</p>
+        <p id="followers_count">Followers: {{profile_user.user_followed.count}}</p>
+    </div>
+
+    <ul class="px-5 w-50" style="list-style: none;">
+        {% for post in posts_of_the_page %}
+        <li class="media-body border border-dark m-2 p-2">
+            <div class="well well-lg">
+                <a href="{% url 'user_profile' user_id=post.user.id %}" class="media-heading reviews"> {{post.user}} </a>
+                <br>
+                <small>{{post.timestamp}}</small>
+                <p class="media-comment" id="postText_{{post.id}}">
+                  {{post.text}}
+                </p>
+   
+                <small id="number_likes_{{post.id}}">{{post.post_likes.count}}</small>
+                
+                {% if post.id in postsCurrentUserLiked %}
+                  <button id="liked_post_btn_{{post.id}}" onclick="like_logic('{{post.id}}')" style="background: none; border: none;" class="fa-solid fa-thumbs-up"></button>
+                {% else %}
+                  <button id="liked_post_btn_{{post.id}}" onclick="like_logic('{{post.id}}')" style="background: none; border: none;" class="fa-regular fa-thumbs-up"></button>
+                {% endif %}
+  
+                <br>
+                
+                {% if current_user == post.user %}
+                  <div id="editBtnContainer_{{post.id}}">
+                    <button class="btn btn-primary" onclick="edit_post('{{post.id}}')">Edit</button>
+                  </div>
+                {% endif %}
+  
+            </div>              
+        </li>
+
+        {% endfor %}
+    </ul>
+    <nav>
+        <ul class="pagination">
+          
+            {% if posts_of_the_page.has_previous %}
+                <li class="page-item mx-2"><a class="page-link" href="?page={{posts_of_the_page.previous_page_number}}">Previous</a></li>
+            {% else %}
+                <li class="page-item mx-2"><a class="page-link text-muted">Previous</a></li>
+            {% endif %}
+  
+            {% if posts_of_the_page.has_next %}
+                <li class="page-item mx-2"><a class="page-link" href="?page={{posts_of_the_page.next_page_number}}">Next</a></li>
+            {% else %}
+                <li class="page-item mx-2"><a class="page-link text-muted">Next</a></li>
+            {% endif %}
+  
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}
